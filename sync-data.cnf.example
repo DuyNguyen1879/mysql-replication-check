@@ -1,0 +1,30 @@
+# Configuration file for sync-data.sh
+# ===================================
+
+# Alerts will be sent to these addresses if data is not in sync
+RECIPIENTS='hello@example.com'
+
+# Master credentials
+MASTER_HOST=127.0.0.1
+MASTER_PORT=3306
+MASTER_USER=root
+MASTER_PASSWORD=password
+
+# database used by pt-table-checksum (needs write permissions)
+DB_NAME=percona
+# table containing master data checksums
+CKSUMS_TABLE=checksum
+# list of slaves
+SLAVE_LIST=""
+# how many attempts on error, both master and slaves
+# (important in case a non-delayed slave lags)
+RETRIES=3
+# silent mode
+QUIET=No
+# How much seconds pt-table-checksum can wait if a slave lags
+MAX_LAG=600
+# if 'True' don't run queries and pt-table-checksum
+# (only for testing)
+DRY_RUN="False" ## dont execute commands (use for testing)
+
+
