@@ -132,9 +132,10 @@ NOTE="Note:  The following commands are intended as a short-cut and can be used 
 if [ -s $TMP.diffs ] ; then
   cat $TMP.diffs | grep "Differences on" | while read w1 w2 host ; do
     echo ""
-    echo "To see replication diffs (SQL statements to fix diffs):"
-    echo "pt-table-sync --print --verbose --replicate $DB_NAME.$CKSUMS_TABLE --no-foreign-key-checks --sync-to-master $host "
+    echo "Server: $host"
     echo ""
+    echo "To see diffs:"
+    echo "pt-table-sync --print --verbose --replicate $DB_NAME.$CKSUMS_TABLE --no-foreign-key-checks --sync-to-master $host "
     echo "To fix diffs:"
     echo "pt-table-sync --verbose --execute --verbose --replicate $DB_NAME.$CKSUMS_TABLE --no-foreign-key-checks --sync-to-master $host "
     echo ""
