@@ -1,10 +1,9 @@
 #!/bin/bash
+
+# get paths
 DIR=$(dirname $0)
 PRG=$(basename $0)
 TMP=/tmp/$PRG.$$.tmp
-RC=0
-THIS_HOST=$(hostname -s)
-THIS_DOMAIN=$(hostname | awk -F. '{ print $2 }')
 
 mysql="mysql --skip-column-names"
 if [ -z $PT_TABLE_CHECKSUM ] ; then
