@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # get paths
-DIR=$(dirname $0)
 PRG=$(basename $0)
 TMP=/tmp/$PRG.$$.tmp
 
@@ -12,12 +11,12 @@ fi
 
 # default parameters
 echo "Reading sync-data.cnf"
-if [ ! -f $DIR/sync-data.cnf ]; then
-  echo "File $DIR/sync-data.cnf not found"
+if [ ! -f sync-data.cnf ]; then
+  echo "File sync-data.cnf not found"
   exit 1
 fi
 
-. $DIR/sync-data.cnf
+. sync-data.cnf
 
 USAGE="sync-data.sh calls pt-table-checksum and sends an alert via email in case slaves are out of sync.
   -s  Step: 1 to check master and regular slaves, 2 to check delayed slaves (after the checksums are replicated).
