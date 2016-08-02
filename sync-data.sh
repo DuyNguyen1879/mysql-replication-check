@@ -65,11 +65,7 @@ if [ "$MASTER_USER" == "" -o "$MASTER_PASSWORD" == "" ] ; then
   exit
 fi
 
-if [ "$STEP" == "1" ] ; then
-  DSNS_TABLE="dsns"
-elif [ "$STEP" == "2" ] ; then
-  DSNS_TABLE="dsns_lag"
-else
+if [ "$STEP" != "1" ] && [ "$STEP" != "2" ] ; then
   echo "STEP (-s) must be specified, and allowed values are 1 and 2!"
   exit
 fi
