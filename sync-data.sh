@@ -6,8 +6,6 @@ RC=0
 THIS_HOST=$(hostname -s)
 THIS_DOMAIN=$(hostname | awk -F. '{ print $2 }')
 
-# . $DIR/admin.cnf
-
 mysql="mysql --skip-column-names"
 if [ -z $PT_TABLE_CHECKSUM ] ; then
   PT_TABLE_CHECKSUM="pt-table-checksum"
@@ -15,7 +13,12 @@ fi
 
 # default parameters
 echo "Reading sync-data.cnf"
-. sync-data.cnf
+if [ ! -f $DIR/sync-data.cnf ]; then
+  echo "File $DIR/sync-data.cnf not found"
+  exit 1
+fi
+
+. $DIR/sync-data.cnf
 
 USAGE="sync-data.sh calls pt-table-checksum and sends an alert via email in case slaves are out of sync.
   -s  Step: 1 to check master and regular slaves, 2 to check delayed slaves (after the checksums are replicated).
