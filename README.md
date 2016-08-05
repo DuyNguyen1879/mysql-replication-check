@@ -29,3 +29,9 @@ sync-data.sh -s 1
 sync-data.sh -s 2
 ```
 
+### Parameters
+
+Some parameters can be passed via the command line, overriding the configuration file settings. See sync-data.sh source code for complete list.
+
+        -X              Dry run: don't execute any SQL statement or run pt tools.
+

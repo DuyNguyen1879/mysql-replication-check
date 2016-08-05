@@ -10,6 +10,7 @@ if [ -z $PT_TABLE_CHECKSUM ] ; then
 fi
 
 # default parameters
+DRY_RUN='0'
 echo "Reading sync-data.cnf"
 if [ ! -f sync-data.cnf ]; then
   echo "File sync-data.cnf not found"
@@ -48,7 +49,7 @@ while getopts h:P:u:p:l:d:c:t:T:o:qw:e:s:l:X c ; do
     w)  WHERE="--where \"${OPTARG}\"" ;;
     e)  ERR_FILE="${OPTARG}" ;;
     l)  MAX_LAG="${OPTARG}" ;;
-    X)  DRY_RUN="True" ;;
+    X)  DRY_RUN='1' ;;
     s)  STEP="${OPTARG}" ;;
     *)
         echo "$USAGE"
@@ -71,11 +72,13 @@ fi
 
 if [ "$STEP" == "1" ]; then
   # prepare the database for re-execution
-  if [ ​"$DRY_RUN" != 'True' ] ; then
+  if [ ​"$DRY_RUN" == '0' ] ; then
     echo "Creating checksum DB: $DB_NAME..."
     mysql -h$MASTER_HOST -P$MASTER_PORT -u$MASTER_USER -p$MASTER_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
     echo "Dropping checksum table table $CKSUMS_TABLE..."
     mysql -h$MASTER_HOST -P$MASTER_PORT -u$MASTER_USER -p$MASTER_PASSWORD -D $DB_NAME -e "TRUNCATE TABLE $CKSUMS_TABLE;"
+  else
+    echo 'Skipping database recreation because because -X was specified'
   fi
 
   # Gather checksums and check differences with non-delayed slaves
@@ -94,10 +97,10 @@ if [ "$STEP" == "1" ]; then
 
   echo "$cmd $WHERE"x
 
-  if [ ​"$DRY_RUN" != 'True' ] ; then
+  if [ ​"$DRY_RUN" == '0' ] ; then
     eval "$cmd $WHERE" 2>&1
   else
-    echo 'Not executing because -X was specified!'
+    echo 'Skipping checksum calculation because because -X was specified'
   fi
 else
   # Check for differences on the delayed slave
@@ -117,10 +120,10 @@ else
   echo "$cmd"
   echo ""
 
-  if [ "$DRY_RUN" != 'True' ]; then
+  if [ "$DRY_RUN" == '0' ]; then
     $cmd | tee -a $TMP.diffs
     else
-      echo 'Not executing because -X was specified!'
+      echo 'Skipping slave checking because because -X was specified'
   fi
 fi
 
