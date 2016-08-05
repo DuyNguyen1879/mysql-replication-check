@@ -1,5 +1,19 @@
 #!/bin/bash
 
+function check_mysql_connection {
+  if [ "`mysql $mysql_options -NBe 'select 1'`" != "1" ] 
+  then
+    echo "Can't connect to local mysql. Please add connection information to ~/.my.cnf"
+    echo "Example: "
+    echo "[client]"
+    echo "user=percona"
+    echo "password=s3cret"
+    echo "# If RDS, add host="
+    echo ""
+    exit 1
+  fi
+}
+
 # get paths
 PRG=$(basename $0)
 TMP=/tmp/$PRG.$$.tmp
@@ -10,7 +24,7 @@ if [ -z $PT_TABLE_CHECKSUM ] ; then
 fi
 
 # default parameters
-DRY_RUN='0'
+DRY_RUN=false
 echo "Reading sync-data.cnf"
 if [ ! -f sync-data.cnf ]; then
   echo "File sync-data.cnf not found"
@@ -49,7 +63,7 @@ while getopts h:P:u:p:l:d:c:t:T:o:qw:e:s:l:X c ; do
     w)  WHERE="--where \"${OPTARG}\"" ;;
     e)  ERR_FILE="${OPTARG}" ;;
     l)  MAX_LAG="${OPTARG}" ;;
-    X)  DRY_RUN='1' ;;
+    X)  DRY_RUN=true ;;
     s)  STEP="${OPTARG}" ;;
     *)
         echo "$USAGE"
@@ -72,7 +86,7 @@ fi
 
 if [ "$STEP" == "1" ]; then
   # prepare the database for re-execution
-  if [ ​"$DRY_RUN" == '0' ] ; then
+  if ! $DRY_RUN 2> /dev/null ; then
     echo "Creating checksum DB: $DB_NAME..."
     mysql -h$MASTER_HOST -P$MASTER_PORT -u$MASTER_USER -p$MASTER_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
     echo "Dropping checksum table table $CKSUMS_TABLE..."
@@ -97,7 +111,7 @@ if [ "$STEP" == "1" ]; then
 
   echo "$cmd $WHERE"x
 
-  if [ ​"$DRY_RUN" == '0' ] ; then
+  if ! $DRY_RUN 2> /dev/null ; then
     eval "$cmd $WHERE" 2>&1
   else
     echo 'Skipping checksum calculation because because -X was specified'
@@ -120,7 +134,7 @@ else
   echo "$cmd"
   echo ""
 
-  if [ "$DRY_RUN" == '0' ]; then
+  if ! $DRY_RUN 2> /dev/null ; then
     $cmd | tee -a $TMP.diffs
     else
       echo 'Skipping slave checking because because -X was specified'
