@@ -14,6 +14,14 @@ function check_mysql_connection {
   fi
 }
 
+# Get specified value from SHOW SLAVE STATUS.
+# Example:
+# $LAG=get_slave_status_variable('Seconds_behind_master')
+function get_slave_status_variable {
+  echo `mysql -h127.0.0.1 -uroot -p'yceZ^gtZL%c669Y!6sT' -P33063 -e "SHOW SLAVE STATUS \G" | grep 'SQL_Delay' | awk '{print $2}'`
+}
+
+
 # get paths
 PRG=$(basename $0)
 TMP=/tmp/$PRG.$$.tmp
@@ -73,6 +81,15 @@ while getopts h:P:u:p:l:d:c:t:T:o:qw:e:s:l:X c ; do
 done
 
 # validate options
+
+if [ "$DATADIR" == "" ] ; then
+  echo "DATADIR must be specified!"
+  exit
+fi
+if [ ! -d "$DATADIR" ]; then
+  echo "Specified DATADIR is not a directory"
+  exit
+fi
 
 if [ "$MASTER_USER" == "" -o "$MASTER_PASSWORD" == "" ] ; then
   echo "MASTER_USER (-u) and MASTER_PASSWORD (-p) must be specified!"
