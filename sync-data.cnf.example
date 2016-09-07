@@ -3,6 +3,8 @@
 
 # Alerts will be sent to these addresses if data is not in sync
 RECIPIENTS='hello@example.com'
+# Helper files are written here
+DATADIR='/opt/mysql_replication_check/data'
 
 # Master credentials
 MASTER_HOST=127.0.0.1

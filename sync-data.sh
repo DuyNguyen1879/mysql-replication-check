@@ -113,6 +113,7 @@ if [ "$STEP" == "1" ]; then
 
   if ! $DRY_RUN 2> /dev/null ; then
     eval "$cmd $WHERE" 2>&1
+    `date +%s` > $DATADIR/master_check_time
   else
     echo 'Skipping checksum calculation because because -X was specified'
   fi
