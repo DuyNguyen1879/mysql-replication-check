@@ -12,6 +12,12 @@ MASTER_PORT=3306
 MASTER_USER=root
 MASTER_PASSWORD=password
 
+# If a delayed slave lags too much, its check will be delayed by DELAY_CHECK_INTERVAL seconds.
+# Then slave will be checked again, DELAY_CHECK_ATTEMPTS times.
+# If it still lags too much, script will fail.
+DELAY_CHECK_INTERVAL=60
+DELAY_CHECK_ATTEMPTS=60
+
 # database used by pt-table-checksum (needs write permissions)
 DB_NAME=percona
 # table containing master data checksums

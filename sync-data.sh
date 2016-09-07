@@ -148,8 +148,16 @@ else
 
   #`(date %s-$DATADIR/master_check_time)`
   if ( MIN_EVENT_TIME > SLAVE_TIMESTAMP ); then
-    echo 'Cannot run check because of replication lag; retry later'
-    exit
+    i=DELAY_CHECK_ATTEMPTS
+    while [ $i -lt 4 ] do
+      i=$[$i-1]
+      SLAVE_CURRENT_LAG=$LAG=get_slave_status_variable('Seconds_behind_master')
+      if ( $i = 0 ); then
+        echo 'Cannot run check because of replication lag; too many attempts'
+        exit
+      fi
+      sleep $DELAY_CHECK_INTERVAL
+    done
   fi
 
   # Check for differences on the delayed slave
