@@ -135,6 +135,23 @@ if [ "$STEP" == "1" ]; then
     echo 'Skipping checksum calculation because because -X was specified'
   fi
 else
+  # check if enough time has passed
+
+  # get lag info from SHOW SLAVE STATUS
+  SLAVE_EXPECTED_DELAY=$LAG=get_slave_status_variable('SQL_Delay')
+  SLAVE_CURRENT_LAG=$LAG=get_slave_status_variable('Seconds_behind_master')
+
+  # check can only be done if slave is applying this timestamp event
+  MIN_EVENT_TIME=(`cat $DATADIR/master_check_time`+SLAVE_EXPECTED_DELAY)
+  # slave is replicating this timestamp
+  SLAVE_TIMESTAMP=(`date %s`-SLAVE_CURRENT_LAG)
+
+  #`(date %s-$DATADIR/master_check_time)`
+  if ( MIN_EVENT_TIME > SLAVE_TIMESTAMP ); then
+    echo 'Cannot run check because of replication lag; retry later'
+    exit
+  fi
+
   # Check for differences on the delayed slave
   cmd="$PT_TABLE_CHECKSUM \
                   --replicate-check \
