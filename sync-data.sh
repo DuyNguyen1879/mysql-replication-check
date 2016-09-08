@@ -18,7 +18,9 @@ function check_mysql_connection {
 # Example:
 # $LAG=get_slave_status_variable('Seconds_behind_master')
 function get_slave_status_variable {
-  echo `mysql -h127.0.0.1 -uroot -p'yceZ^gtZL%c669Y!6sT' -P33063 -e "SHOW SLAVE STATUS \G" | grep 'SQL_Delay' | awk '{print $2}'`
+  host=$1
+  var_name=$2
+  echo `mysql $host -e "SHOW SLAVE STATUS \G" | grep '$var_name' | awk '{print \$2}'`
 }
 
 
@@ -138,8 +140,9 @@ else
   # check if enough time has passed
 
   # get lag info from SHOW SLAVE STATUS
-  SLAVE_EXPECTED_DELAY=$LAG=get_slave_status_variable('SQL_Delay')
-  SLAVE_CURRENT_LAG=$LAG=get_slave_status_variable('Seconds_behind_master')
+  mysql_options="-h127.0.0.1 -P33062"
+  SLAVE_EXPECTED_DELAY=$LAG=get_slave_status_variable($mysql_options, 'SQL_Delay')
+  SLAVE_CURRENT_LAG=$LAG=get_slave_status_variable($mysql_options, 'Seconds_behind_master')
 
   # check can only be done if slave is applying this timestamp event
   MIN_EVENT_TIME=(`cat $DATADIR/master_check_time`+SLAVE_EXPECTED_DELAY)
